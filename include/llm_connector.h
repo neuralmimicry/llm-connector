@@ -7,7 +7,7 @@
  * @file llm_connector.h
  * @brief A header file that declares the functions to connect to multiple large language models (LLMs) and send text requests to them.
  *
- * @author Bard
+ * @author Paul B. Isaac's
  * @date 2023-05-11
  */
 
