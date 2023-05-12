@@ -66,7 +66,7 @@ build CMakeFiles/llm_connector.dir/src/llm_connector.cpp.o: CXX_COMPILER__llm_co
 
 build llm_connector: CXX_EXECUTABLE_LINKER__llm_connector_Debug CMakeFiles/llm_connector.dir/src/llm_connector.cpp.o | /usr/lib64/libcurl.so
   FLAGS = -g
-  LINK_LIBRARIES = /usr/lib64/libcurl.so
+  LINK_LIBRARIES = /usr/lib64/libcurl.so  -lpthread
   OBJECT_DIR = CMakeFiles/llm_connector.dir
   POST_BUILD = :
   PRE_LINK = :

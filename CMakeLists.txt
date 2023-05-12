@@ -17,6 +17,7 @@ target_include_directories(llm_connector PRIVATE
 # Link libraries to the target
 target_link_libraries(llm_connector PRIVATE
         ${CURL_LIBRARIES}
+        pthread
         )
 
 # Specify compile options

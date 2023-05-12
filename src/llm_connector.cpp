@@ -1,6 +1,13 @@
 /**
  * @file llm_connector.cpp
  * @brief Functions for interacting with LLMs via CURL.
+ *
+ * This file contains the implementation of functions that are used to connect to
+ * and communicate with Language Learning Machines (LLMs) using the CURL library.
+ *
+ * @author Paul B. Isaac's
+ * @date 12-May-2023
+ * @version 0.1
  */
 
 #include "llm_connector.h"
@@ -12,6 +19,9 @@
 
 // CURL includes
 #include <curl/curl.h>
+
+// CROW includes
+#include "crow.h"
 
 // Private function to log errors
 void log_error(const std::string &error_message) {
@@ -194,6 +204,19 @@ int main() {
 
     // Set the text to send
     std::string text = "Hello, world!";
+
+    // Crow server
+    crow::SimpleApp app;
+
+    // Define a route that receives a POST request at /text
+    CROW_ROUTE(app, "/text").methods(crow::HTTPMethod::Post)
+            ([](const crow::request& req) {
+                // Replace the "Hello, World!" message with the body of the request
+                std::string received_text = req.body;
+                return received_text;
+            });
+
+    app.port(8080).run();
 
     // Loop over the LLMs
     for (auto llm : llms) {

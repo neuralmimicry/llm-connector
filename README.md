@@ -1,6 +1,7 @@
 # llm-connector
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/neuralmimicry/llm-connector/LLM-Connector)
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=neuralmimicry&url=https://github.com/neuralmimicry/llm-connector&title=LLM-Connector&language=&tags=github&category=software)
 
 Have conversations between multiple LLMs
 
@@ -9,6 +10,8 @@ Why have one AI when you can have the input from many? Of course, you will need 
 
 Tuning, so that you do not need to keep setting a context for domain specific knowledge, is a goal of this project. This is parameterised so that the user can select
 the area of domain knowledge at the start of the conversation.
+
+Note: Crow and Asio include folders have been added to the project.
 
 ## Installation
 
