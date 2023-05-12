@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt-get install -y libcurl4-openssl-dev libboost-all-dev libssl-dev docker
+        run: sudo apt-get install -y libcurl4-openssl-dev libboost-all-dev libssl-dev podman buildah
 
       - name: Configure CMake
         run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
@@ -30,9 +30,9 @@ jobs:
         run: ctest -C ${{env.BUILD_TYPE}}
 
       - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u neuralmimicry --password-stdin
+        run: echo "${{ secrets.GHCR_PAT }}" | podman login ghcr.io -u neuralmimicry --password-stdin
 
-      - name: Build and push Docker image
+      - name: Build and push Container image
         run: |
-          docker build -t ghcr.io/neuralmimicry/llm_connector:latest .
-          docker push ghcr.io/neuralmimicry/llm_connector:latest
+          buildah build -t ghcr.io/neuralmimicry/llm_connector:latest .
+          buildah push ghcr.io/neuralmimicry/llm_connector:latest
