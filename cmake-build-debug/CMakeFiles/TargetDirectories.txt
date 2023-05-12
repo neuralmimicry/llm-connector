@@ -1,0 +1,3 @@
+/home/pbisaacs/Developer/llm-connector/cmake-build-debug/CMakeFiles/llm_connector.dir
+/home/pbisaacs/Developer/llm-connector/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/pbisaacs/Developer/llm-connector/cmake-build-debug/CMakeFiles/rebuild_cache.dir
