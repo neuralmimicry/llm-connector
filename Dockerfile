@@ -1,26 +1,28 @@
-# Use an official C++ base image
-FROM gcc:latest
+# 1st stage, build the application
+FROM gcc:latest AS builder
 LABEL authors="pbisaacs"
 
-# Set the working directory in the container to /app
 WORKDIR /app
-
-# Copy the current directory contents into the container at /app
 COPY . /app/
 
-# Install any needed dependencies...
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev cmake
 
-# Compile your C++ code
-RUN cmake .
+RUN cmake . && make
 
-# Expose port 8080 for the app to listen on
+# 2nd stage, build the final Docker image
+FROM debian:bullseye-slim
+
+WORKDIR /app
+
+# Copy the built binary from the 1st stage
+COPY --from=builder /app/llm_connector .
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libcurl4-openssl-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 EXPOSE 8080
 
-# Define environment variable (optional)
-# ENV NAME World
-
-# Run the app when the container launches
 CMD ["/app/llm_connector"]
-

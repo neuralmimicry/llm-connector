@@ -202,49 +202,51 @@ int main() {
         llms.push_back(llm);
     }
 
-    // Set the text to send
-    std::string text = "Hello, world!";
-
     // Crow server
     crow::SimpleApp app;
 
     // Define a route that receives a POST request at /text
     CROW_ROUTE(app, "/text").methods(crow::HTTPMethod::Post)
-            ([](const crow::request& req) {
+            ([&](const crow::request& req) {
                 // Replace the "Hello, World!" message with the body of the request
                 std::string received_text = req.body;
-                return received_text;
+
+                // Loop over the LLMs
+                for (auto llm : llms) {
+                    // Send the text request to the LLM
+                    std::string response = send_request(llm, received_text);
+
+                    // If the LLM responded with an error, stop
+                    if (response.empty()) {
+                        std::cerr << "Error: no response from LLM" << std::endl;
+                        continue;
+                    }
+
+                    // Log the exchange
+                    log_exchange(llm, "", received_text);
+
+                    // Check if the response contains a new LLM
+                    std::string new_llm;
+                    std::regex new_llm_pattern("New LLM: (.+)");
+                    std::smatch matches;
+                    if (std::regex_search(response, matches, new_llm_pattern)) {
+                        new_llm = matches[1].str();
+                    }
+
+                    // If a new LLM was found, update the configuration file
+                    if (!new_llm.empty()) {
+                        update_config(new_llm, llm + "/v1/text");
+                    }
+
+                    // Send the response back through the Crow connection
+                    return crow::response{response};
+                }
+
+                // In case of no LLMs or no response, return an error message
+                return crow::response{500, "Internal server error"};
             });
 
     app.port(8080).run();
-
-    // Loop over the LLMs
-    for (auto llm : llms) {
-        // Send the text request to the LLM
-        std::string response = send_request(llm, text);
-
-        // If the LLM responded with an error, stop
-        if (response.empty()) {
-            std::cerr << "Error: no response from LLM" << std::endl;
-            continue;
-        }
-
-        // Log the exchange
-        log_exchange(llm, "", text);
-
-        // Check if the response contains a new LLM
-        std::string new_llm;
-        std::regex new_llm_pattern("New LLM: (.+)");
-        std::smatch matches;
-        if (std::regex_search(response, matches, new_llm_pattern)) {
-            new_llm = matches[1].str();
-        }
-
-        // If a new LLM was found, update the configuration file
-        if (!new_llm.empty()) {
-            update_config(new_llm, llm + "/v1/text");
-        }
-    }
 
     // Clean up
     cleanup_curl(curl);
