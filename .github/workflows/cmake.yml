@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
 
     steps:
       - uses: actions/checkout@v3
@@ -20,13 +20,13 @@ jobs:
         run: sudo apt-get install -y libcurl4-openssl-dev libboost-all-dev libssl-dev podman buildah
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: cmake -B ${{runner.temp}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        run: cmake --build ${{runner.temp}}/build --config ${{env.BUILD_TYPE}}
 
       - name: Test
-        working-directory: ${{github.workspace}}/build
+        working-directory: ${{runner.temp}}/build
         run: ctest -C ${{env.BUILD_TYPE}}
 
       - name: Login to GitHub Container Registry
