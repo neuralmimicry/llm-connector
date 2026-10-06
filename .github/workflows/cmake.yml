@@ -9,6 +9,10 @@ on:
 env:
   BUILD_TYPE: Release
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     runs-on: [self-hosted, Linux, X64]
@@ -28,7 +32,9 @@ jobs:
           exit "$status"
 
       - name: Install dependencies
-        run: sudo apt-get install -y libcurl4-openssl-dev libboost-all-dev libssl-dev podman buildah
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libboost-all-dev libssl-dev podman buildah
 
       - name: Configure CMake
         run: cmake -B ${{runner.temp}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
@@ -41,9 +47,14 @@ jobs:
         run: ctest -C ${{env.BUILD_TYPE}}
 
       - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_PAT }}" | podman login ghcr.io -u neuralmimicry --password-stdin
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GHCR_TOKEN" | podman login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build and push Container image
-        run: |
-          buildah build -t ghcr.io/neuralmimicry/llm_connector:latest .
-          buildah push ghcr.io/neuralmimicry/llm_connector:latest
+      - name: Build Container image
+        run: buildah build -t ghcr.io/neuralmimicry/llm_connector:latest .
+
+      - name: Push Container image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: buildah push ghcr.io/neuralmimicry/llm_connector:latest
